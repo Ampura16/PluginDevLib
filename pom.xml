@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.mineacademy</groupId>
+	<artifactId>foundation-parent</artifactId>
+	<version>7.0.0</version>
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>foundation-bukkit</module>
+		<module>foundation-velocity</module>
+		<module>foundation-bungee</module>
+		<module>foundation-core</module>
+	</modules>
+
+	<repositories>
+		<repository>
+			<id>papermc</id>
+			<url>https://repo.papermc.io/repository/maven-public/</url>
+		</repository>
+		<repository>
+			<id>bungeecord-repo</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</repository>
+		<repository>
+			<id>mineacademy-repo</id>
+			<url>https://bitbucket.org/kangarko/libraries/raw/master</url>
+		</repository>
+		<repository>
+			<id>minecraft-libraries</id>
+			<url>https://libraries.minecraft.net</url>
+		</repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.46</version>
+		</dependency>
+
+		<!-- Adventure -->
+		<dependency>
+			<groupId>net.kyori</groupId>
+			<artifactId>adventure-api</artifactId>
+			<version>5.2.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.kyori</groupId>
+			<artifactId>adventure-text-minimessage</artifactId>
+			<version>5.2.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.kyori</groupId>
+			<artifactId>adventure-text-serializer-plain</artifactId>
+			<version>5.2.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.kyori</groupId>
+			<artifactId>adventure-text-serializer-gson</artifactId>
+			<version>5.2.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.kyori</groupId>
+			<artifactId>adventure-text-serializer-legacy</artifactId>
+			<version>5.2.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.kyori</groupId>
+			<artifactId>adventure-text-serializer-bungeecord</artifactId>
+			<version>4.4.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- BungeeCord Chat API -->
+		<dependency>
+			<groupId>net.md-5</groupId>
+			<artifactId>bungeecord-chat</artifactId>
+			<version>26.1-R0.1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- We have our own config implementation updated to YAML 1.2 -->
+		<dependency>
+			<groupId>org.snakeyaml</groupId>
+			<artifactId>snakeyaml-engine</artifactId>
+			<version>3.0.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.14.0</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- HikariCP for the database connection pool (downloaded at runtime in SimpleDatabase).
+			 Provided scope means compile-time only; the runtime download via loadLibrary
+			 keeps Foundation's plugin JAR small. -->
+		<dependency>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
+			<version>7.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<properties>
+		<author>kangarko</author>
+		<maven.compiler.release>21</maven.compiler.release>
+		<maven.compiler.showWarnings>false</maven.compiler.showWarnings>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>3.5.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.15.0</version>
+					<configuration>
+						<annotationProcessorPaths>
+							<path>
+								<groupId>org.projectlombok</groupId>
+								<artifactId>lombok</artifactId>
+								<version>1.18.46</version>
+							</path>
+						</annotationProcessorPaths>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-shade-plugin</artifactId>
+					<version>3.6.2</version>
+					<executions>
+						<execution>
+							<phase>package</phase>
+							<goals>
+								<goal>shade</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<createDependencyReducedPom>false</createDependencyReducedPom>
+						<artifactSet>
+							<includes>
+								<include>org.mineacademy:foundation-core*</include>
+							</includes>
+						</artifactSet>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+</project>

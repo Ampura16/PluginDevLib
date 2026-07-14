@@ -1,0 +1,141 @@
+package org.mineacademy.fo.model;
+
+import org.bukkit.plugin.Plugin;
+import org.mineacademy.fo.platform.Platform;
+
+/**
+ * A Folia-compatible Bukkit Runnable alternative.
+ */
+public abstract class SimpleRunnable implements Runnable {
+
+	private Task task;
+
+	public final synchronized void cancel() throws IllegalStateException {
+		this.checkScheduled();
+
+		this.task.cancel();
+		this.onCancel();
+	}
+
+	/**
+	 * Called after {@link #cancel()}
+	 */
+	protected void onCancel() {
+	}
+
+	/**
+	 * Schedules this in the scheduler to run on next tick.
+	 *
+	 * @param plugin the reference to the plugin scheduling task
+	 * @return
+	 * @throws IllegalArgumentException if plugin is null
+	 * @throws IllegalStateException    if this was already scheduled
+	 */
+	public final synchronized Task runTask(final Plugin plugin) throws IllegalArgumentException, IllegalStateException {
+		this.checkNotYetScheduled();
+
+		return this.setupTask(Platform.runTask(this));
+	}
+
+	/**
+	 * Schedules this in the scheduler to run on next tick async.
+	 *
+	 * @param plugin the reference to the plugin scheduling task
+	 * @return
+	 * @throws IllegalArgumentException if plugin is null
+	 * @throws IllegalStateException    if this was already scheduled
+	 */
+	public final synchronized Task runTaskAsync(final Plugin plugin) throws IllegalArgumentException, IllegalStateException {
+		this.checkNotYetScheduled();
+
+		return this.setupTask(Platform.runTaskAsync(this));
+	}
+
+	/**
+	 * Schedules this to run after the specified number of server ticks.
+	 *
+	 * @param plugin the reference to the plugin scheduling task
+	 * @param delay  the ticks to wait before running the task
+	 * @return
+	 * @throws IllegalArgumentException if plugin is null
+	 * @throws IllegalStateException    if this was already scheduled
+	 */
+	public final synchronized Task runTaskLater(final Plugin plugin, final long delay) throws IllegalArgumentException, IllegalStateException {
+		this.checkNotYetScheduled();
+
+		return this.setupTask(Platform.runTask((int) delay, this));
+	}
+
+	/**
+	 * Schedules this to run after the specified number of server ticks async.
+	 *
+	 * @param plugin the reference to the plugin scheduling task
+	 * @param delay  the ticks to wait before running the task
+	 * @return
+	 * @throws IllegalArgumentException if plugin is null
+	 * @throws IllegalStateException    if this was already scheduled
+	 */
+	public final synchronized Task runTaskLaterAsynchronously(final Plugin plugin, final long delay) throws IllegalArgumentException, IllegalStateException {
+		this.checkNotYetScheduled();
+
+		return this.setupTask(Platform.runTaskAsync((int) delay, this));
+	}
+
+	/**
+	 * Schedules this to run after the specified number of server ticks.
+	 *
+	 * @param plugin the reference to the plugin scheduling task
+	 * @param delay the ticks to wait before running the task initially
+	 * @param period the ticks to wait before running the task again
+	 *
+	 * @return
+	 * @throws IllegalArgumentException if plugin is null
+	 * @throws IllegalStateException    if this was already scheduled
+	 */
+	public final synchronized Task runTaskTimer(final Plugin plugin, final long delay, final long period) throws IllegalArgumentException, IllegalStateException {
+		this.checkNotYetScheduled();
+
+		return this.setupTask(Platform.runTaskTimer((int) delay, (int) period, this));
+	}
+
+	/**
+	 * Schedules this to run after the specified number of server ticks async.
+	 *
+	 * @param plugin the reference to the plugin scheduling task
+	 * @param delay the ticks to wait before running the task initially
+	 * @param period the ticks to wait before running the task again
+	 *
+	 * @return
+	 * @throws IllegalArgumentException if plugin is null
+	 * @throws IllegalStateException    if this was already scheduled
+	 */
+	public final synchronized Task runTaskTimerAsynchronously(final Plugin plugin, final long delay, final long period) throws IllegalArgumentException, IllegalStateException {
+		this.checkNotYetScheduled();
+
+		return this.setupTask(Platform.runTaskTimerAsync((int) delay, (int) period, this));
+	}
+
+	private void checkScheduled() {
+		if (this.task == null)
+			throw new IllegalStateException("Not scheduled yet");
+	}
+
+	private void checkNotYetScheduled() {
+		if (this.task != null)
+			throw new IllegalStateException("Already scheduled");
+	}
+
+	/**
+	 * @deprecated internal use only
+	 *
+	 * @param task
+	 * @return
+	 */
+	@Deprecated
+	public Task setupTask(final Task task) {
+		this.task = task;
+
+		return task;
+	}
+
+}

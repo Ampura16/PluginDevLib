@@ -1,0 +1,69 @@
+package org.mineacademy.fo.platform;
+
+import java.io.ByteArrayInputStream;
+import java.util.UUID;
+
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.messaging.PluginMessageListener;
+import org.mineacademy.fo.proxy.ProxyListener;
+import org.mineacademy.fo.proxy.ProxyMessage;
+import org.mineacademy.fo.proxy.message.IncomingMessage;
+
+import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteStreams;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+/**
+ * Distributes received plugin message across all {@link ProxyListener} classes
+ *
+ * @deprecated internal use only
+ */
+@Deprecated
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+final class BukkitPluginMessage implements PluginMessageListener {
+
+	@Getter
+	private static final BukkitPluginMessage instance = new BukkitPluginMessage();
+
+	@Deprecated
+	@Override
+	public void onPluginMessageReceived(final String channel, final Player player, final byte[] data) {
+		if (!channel.equals(ProxyListener.DEFAULT_CHANNEL))
+			return;
+
+		final ByteArrayInputStream stream = new ByteArrayInputStream(data);
+		ByteArrayDataInput input;
+
+		try {
+			input = ByteStreams.newDataInput(stream);
+
+		} catch (final Throwable t) {
+			input = ByteStreams.newDataInput(data);
+		}
+
+		final String channelName = input.readUTF();
+
+		for (final ProxyListener listener : ProxyListener.getRegisteredListeners())
+			if (channelName.equals(listener.getChannel())) {
+
+				final UUID senderUid = UUID.fromString(input.readUTF());
+				final String serverName = input.readUTF();
+				final String actionName = input.readUTF();
+
+				final ProxyMessage message = ProxyMessage.getByName(listener, actionName);
+
+				if (message == null)
+					listener.onInvalidMessageReceived(senderUid, serverName, actionName);
+				else {
+					final IncomingMessage incomingMessage = new IncomingMessage(listener, senderUid, serverName, message, data, input, stream);
+
+					listener.onMessageReceived(incomingMessage);
+				}
+
+				break;
+			}
+	}
+}

@@ -1,0 +1,51 @@
+package org.mineacademy.fo.command;
+
+import org.mineacademy.fo.CommonCore;
+import org.mineacademy.fo.platform.Platform;
+
+import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.plugin.TabExecutor;
+
+/**
+ * Represents a Bukkit command.
+ *
+ * @deprecated internal use only
+ */
+@Deprecated
+public final class BungeeCommandImpl extends net.md_5.bungee.api.plugin.Command implements TabExecutor {
+
+	/**
+	 * The delegated command.
+	 */
+	private final SimpleCommandCore delegate;
+
+	/**
+	 * Wrap a Foundation command into a Bukkit command.
+	 *
+	 * @param delegate
+	 */
+	@Deprecated
+	public BungeeCommandImpl(final SimpleCommandCore delegate) {
+		super(delegate.getLabel(), null /* we check for perm in the delegate so it's null here */, CommonCore.toArray(delegate.getAliases()));
+
+		this.delegate = delegate;
+	}
+
+	/**
+	 * Delegates execution to the Foundation command.
+	 */
+	@Deprecated
+	@Override
+	public void execute(final CommandSender sender, final String[] args) {
+		this.delegate.delegateExecute(Platform.toPlayer(sender), this.delegate.getLabel(), args);
+	}
+
+	/**
+	 * Delegates tab completion to the Foundation command.
+	 */
+	@Deprecated
+	@Override
+	public Iterable<String> onTabComplete(final CommandSender sender, final String[] args) {
+		return this.delegate.delegateTabComplete(Platform.toPlayer(sender), this.delegate.getLabel(), args);
+	}
+}
