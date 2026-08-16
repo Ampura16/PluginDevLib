@@ -1,0 +1,229 @@
+<!-- (c) All rights reserved. Do not share, copy, reproduce 
+	or sell any part of this library unless you have written permission from 
+	MineAcademy.org. All infringements will be prosecuted. If you are the personal 
+	owner of the MineAcademy.org End User License then you may use it for your 
+	own use in plugins but not for any other purpose. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.mineacademy</groupId>
+    <artifactId>Foundation</artifactId>
+    <version>6.10.1</version>
+    <packaging>jar</packaging>
+
+    <name>Foundation</name>
+    <description>A framework for the development of Minecraft plugins for Paper.</description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>21</java.version>
+        <lombok.version>1.18.32</lombok.version>
+    </properties>
+
+    <!-- 锁定 paper-api 版本，防止第三方依赖拉入异常高版本 -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.papermc.paper</groupId>
+                <artifactId>paper-api</artifactId>
+                <version>1.21.1-R0.1-SNAPSHOT</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <repositories>
+        <repository>
+            <id>mineacademy-repo</id>
+            <url>https://bitbucket.org/kangarko/libraries/raw/master</url>
+        </repository>
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>minecraft-libraries</id>
+            <url>https://libraries.minecraft.net</url>
+        </repository>
+        <repository>
+		    <id>papermc</id>
+		    <url>https://repo.papermc.io/repository/maven-public/</url>
+		</repository>
+    </repositories>
+
+    <dependencies>
+
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.32</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.26.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.33</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.mojang</groupId>
+            <artifactId>datafixerupper</artifactId>
+            <version>4.0.26</version>
+        </dependency>
+
+        <!-- The Paper API (1.21.1) -->
+        <dependency>
+		    <groupId>io.papermc.paper</groupId>
+		    <artifactId>paper-api</artifactId>
+		    <version>1.21.1-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+		</dependency>
+
+        <!-- MineAcademy guaranteed availability repos for plugins -->
+        <dependency>
+            <groupId>org.mineacademy.plugin</groupId>
+            <artifactId>AuthMe</artifactId>
+            <version>5.7.0-SNAPSHOT-b2658</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mineacademy.plugin</groupId>
+            <artifactId>BentoBox</artifactId>
+            <version>3.13.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mineacademy.plugin</groupId>
+            <artifactId>CitizensAPI</artifactId>
+            <version>2.0.42-SNAPSHOT-20260404</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mineacademy.plugin</groupId>
+            <artifactId>CMIAPI</artifactId>
+            <version>9.7.14.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mineacademy.plugin</groupId>
+            <artifactId>DiscordSRV</artifactId>
+            <version>1.30.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mineacademy.plugin</groupId>
+            <artifactId>EssentialsX</artifactId>
+            <version>2.22.0-dev+93-1038b3a</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mineacademy.plugin</groupId>
+            <artifactId>Factions</artifactId>
+            <version>3.3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mineacademy.plugin</groupId>
+            <artifactId>FactionsUUID</artifactId>
+            <version>4.5.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mineacademy.plugin</groupId>
+            <artifactId>MassiveCore</artifactId>
+            <version>3.3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mineacademy.plugin</groupId>
+            <artifactId>mcMMO</artifactId>
+            <version>2.2.050-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mineacademy.plugin</groupId>
+            <artifactId>MultiverseCore</artifactId>
+            <version>5.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mineacademy.plugin</groupId>
+            <artifactId>MythicMobs</artifactId>
+            <version>5.11.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mineacademy.plugin</groupId>
+            <artifactId>NuVotifier</artifactId>
+            <version>2.7.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mineacademy.plugin</groupId>
+            <artifactId>PlaceholderAPI</artifactId>
+            <version>2.12.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mineacademy.plugin</groupId>
+            <artifactId>ProtocolLib</artifactId>
+            <version>5.4.1-SNAPSHOT-1257506</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mineacademy.plugin</groupId>
+            <artifactId>Residence</artifactId>
+            <version>6.0.1.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mineacademy.plugin</groupId>
+            <artifactId>SimpleClans</artifactId>
+            <version>2.19.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mineacademy.plugin</groupId>
+            <artifactId>Towny</artifactId>
+            <version>0.102.0.13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mineacademy.plugin</groupId>
+            <artifactId>TownyChat</artifactId>
+            <version>0.120</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mineacademy.plugin</groupId>
+            <artifactId>Vault</artifactId>
+            <version>1.7.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mineacademy.plugin</groupId>
+            <artifactId>WorldEdit</artifactId>
+            <version>7.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mineacademy.plugin</groupId>
+            <artifactId>WorldGuard</artifactId>
+            <version>7.0.16-SNAPSHOT+2351-6b994f0</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <release>21</release>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
