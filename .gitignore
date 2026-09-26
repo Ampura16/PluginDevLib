@@ -68,3 +68,7 @@ $RECYCLE.BIN/
 # Mac crap
 .DS_Store
 REBASE.bat
+
+# Generated Javadoc
+/docs/javadoc/
+/javadoc/
