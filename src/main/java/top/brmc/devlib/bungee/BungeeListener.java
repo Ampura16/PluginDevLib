@@ -1,0 +1,167 @@
+package top.brmc.devlib.bungee;
+
+import java.io.ByteArrayInputStream;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
+import org.bukkit.plugin.messaging.PluginMessageListener;
+import top.brmc.devlib.Common;
+import top.brmc.devlib.Valid;
+import top.brmc.devlib.bungee.message.IncomingMessage;
+import top.brmc.devlib.plugin.SimplePlugin;
+
+import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteStreams;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+
+/**
+ * 代表使用 Bungee 频道的 BungeeCord 监听器，
+ * 你可以在该频道上监听接收到的消息
+ * <p>
+ * 为方便起见，本类也是 Bukkit 事件的 Listener
+ */
+@Getter
+public abstract class BungeeListener implements Listener {
+
+	/**
+	 * 默认频道
+	 */
+	public static final String DEFAULT_CHANNEL = "BungeeCord";
+
+	/**
+	 * 保存已注册的 Bungee 监听器
+	 */
+	private static final Set<BungeeListener> registeredListeners = new HashSet<>();
+
+	/**
+	 * 该频道
+	 */
+	@Getter
+	private final String channel;
+
+	/**
+	 * 动作
+	 */
+	@Getter
+	private final BungeeMessageType[] actions;
+
+	/**
+	 * 读取数据用的临时变量
+	 */
+	@Getter(value = AccessLevel.PROTECTED)
+	private byte[] data;
+
+	/**
+	 * 用给定参数创建新的 Bungee 套件
+	 *
+	 * @param channel
+	 * @param actionEnum
+	 */
+	protected BungeeListener(@NonNull String channel, Class<? extends BungeeMessageType> actionEnum) {
+		this.channel = channel;
+		this.actions = toActions(actionEnum);
+
+		for (final BungeeListener listener : registeredListeners)
+			if (listener.getChannel().equals(this.getChannel()))
+				return;
+
+		registeredListeners.add(this);
+	}
+
+	private static BungeeMessageType[] toActions(@NonNull Class<? extends BungeeMessageType> actionEnum) {
+		Valid.checkBoolean(actionEnum != BungeeMessageType.class, "When creating BungeeListener put your own class that extend BungeeMessageType there, not BungeeMessageType class itself!");
+		Valid.checkBoolean(actionEnum.isEnum(), "BungeeListener expects BungeeMessageType to be an enum, given: " + actionEnum);
+
+		try {
+			return (BungeeMessageType[]) actionEnum.getMethod("values").invoke(null);
+
+		} catch (final ReflectiveOperationException ex) {
+			Common.throwError(ex, "Unable to get values() of " + actionEnum + ", ensure it is an enum or has 'public static T[] values() method'!");
+
+			return null;
+		}
+	}
+
+	/**
+	 * 收到来自 Bungeecord 的插件消息时自动调用，
+	 * 见 https://spigotmc.org/wiki/bukkit-bungee-plugin-messaging-channel
+	 *
+	 * @param player
+	 * @param message
+	 */
+	public abstract void onMessageReceived(Player player, IncomingMessage message);
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof BungeeListener && ((BungeeListener) obj).getChannel().equals(this.getChannel());
+	}
+
+	/**
+	 * @deprecated 仅内部使用
+	 */
+	@Deprecated
+	public static void clearRegisteredListeners() {
+		registeredListeners.clear();
+	}
+
+	/**
+	 * 将收到的插件消息分发到所有 {@link BungeeListener} 类
+	 *
+	 * @deprecated 仅内部使用
+	 */
+	@Deprecated
+	@NoArgsConstructor(access = AccessLevel.PRIVATE)
+	public static final class BungeeListenerImpl implements PluginMessageListener {
+
+		@Getter
+		private static final BungeeListenerImpl instance = new BungeeListenerImpl();
+
+		@Override
+		public void onPluginMessageReceived(String channel, Player player, byte[] data) {
+			synchronized (SimplePlugin.getInstance()) {
+
+				// Check if the message is for a server (ignore client messages)
+				if (!channel.equals(DEFAULT_CHANNEL))
+					return;
+
+				// Read the plugin message
+				final ByteArrayInputStream stream = new ByteArrayInputStream(data);
+				ByteArrayDataInput input;
+
+				try {
+					input = ByteStreams.newDataInput(stream);
+
+				} catch (final Throwable t) {
+					input = ByteStreams.newDataInput(data);
+				}
+
+				final String channelName = input.readUTF();
+
+				for (final BungeeListener listener : registeredListeners)
+					if (channelName.equals(listener.getChannel())) {
+
+						final UUID senderUid = UUID.fromString(input.readUTF());
+						final String serverName = input.readUTF();
+						final String actionName = input.readUTF();
+
+						final BungeeMessageType action = BungeeMessageType.getByName(listener, actionName);
+						Valid.checkNotNull(action, "Unknown plugin action '" + actionName + "'. IF YOU UPDATED THE PLUGIN BY RELOADING, stop your entire network, ensure all servers were updated and start it again.");
+
+						final IncomingMessage message = new IncomingMessage(listener, senderUid, serverName, action, data, input, stream);
+
+						listener.data = data;
+						listener.onMessageReceived(player, message);
+
+						break;
+					}
+			}
+		}
+	}
+}

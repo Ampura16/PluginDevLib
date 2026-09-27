@@ -106,7 +106,7 @@ Maven 有个限制：如果你没有正确配置 maven-shade-plugin 的 includes
         <relocations>
             <!-- 把 Foundation 搬到你自己包下的 “lib” 子包，防止冲突。-->
             <relocation>
-                <pattern>org.mineacademy.fo</pattern>
+                <pattern>top.brmc.devlib</pattern>
                 <shadedPattern>your.plugin.main.package.lib</shadedPattern>
             </relocation>
         </relocations>
