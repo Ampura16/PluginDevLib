@@ -298,12 +298,10 @@ public abstract class SimpleCommandGroup {
 	 *
 	 * @return
 	 */
-
 	protected boolean sendHelpIfNoArgs() {
 		return false;
 	}
 
-	// Return the TM symbol in case we have it for kangarko's plugins
 	private String getTrademark() {
 		return SimplePlugin.getInstance().getDescription().getAuthors().contains("kangarko") ? this.getHeaderPrefix() + "&8\u2122" : "";
 	}
@@ -316,7 +314,7 @@ public abstract class SimpleCommandGroup {
 	 * @return
 	 */
 	protected String getCredits() {
-		return "&7Visit &fmineacademy.org &7for more information.";
+		return "&7访问 &fhttps://mcziya.com/blockland &7了解更多信息.";
 	}
 
 	/**
